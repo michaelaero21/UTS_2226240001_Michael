@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulasi Pembayaran THR</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+    position: relative; /* Menambahkan posisi relatif untuk kontainer */
+  }
+
+  h1 {
+    margin-top: 0;
+    color: #333;
+  }
+
+  input {
+    width: calc(100% - 20px);
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  #output {
+    margin-top: 20px;
+    text-align: left;
+  }
+
+  p {
+    margin: 5px 0;
+  }
+
+  /* Menambahkan gaya untuk overlay loading */
+  #loadingOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: none; /* Sembunyikan secara default */
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Animasi loading berputar */
+  .spinner {
+    width: 40px;
+    height: 40px;
+    position: relative;
+  }
+
+  .spinner div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    margin: 6px;
+    border: 3px solid #007bff;
+    border-radius: 50%;
+    animation: spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #007bff transparent transparent transparent;
+  }
+
+  .spinner div:nth-child(1) {
+    animation-delay: -0.45s;
+  }
+
+  .spinner div:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+
+  .spinner div:nth-child(3) {
+    animation-delay: -0.15s;
+  }
+
+  @keyframes spinner {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Simulasi Pembayaran THR</h1>
+
+  <form id="thrForm">
+    <input type="number" id="gajiPokok" placeholder="Gaji Pokok" required><br>
+    <input type="number" id="tunjanganTetap" placeholder="Tunjangan Tetap" required><br>
+    <input type="number" id="masaKerja" placeholder="Masa Kerja (bulan)" required><br>
+
+    <button type="button" onclick="hitungTHR()">Hitung Pembayaran THR</button>
+  </form>
+
+  <div id="output"></div>
+
+  <!-- Overlay loading -->
+  <div id="loadingOverlay">
+    <div class="spinner">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function hitungTHR() {
+    // Menampilkan overlay loading
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    loadingOverlay.style.display = "flex";
+
+    setTimeout(function() {
+      const gajiPokok = parseFloat(document.getElementById("gajiPokok").value);
+      const tunjanganTetap = parseFloat(document.getElementById("tunjanganTetap").value);
+      const masaKerja = parseInt(document.getElementById("masaKerja").value);
+
+      const totalGaji = gajiPokok + tunjanganTetap;
+      let THR;
+      if (masaKerja >= 12) {
+          THR = totalGaji;
+      } else {
+          THR = (masaKerja / 12) * totalGaji;
+      }
+
+      const PTKP = 4500000;
+      const tarifPPH = 0.05;
+      let PPH = 0;
+      if (totalGaji > PTKP) {
+          PPH = (totalGaji - PTKP) * tarifPPH;
+      }
+
+      const totalPembayaran = THR + PPH;
+
+      const outputElement = document.getElementById("output");
+      outputElement.innerHTML = `
+        <p>Total Gaji: Rp ${totalGaji.toLocaleString()}</p>
+        <p>THR: Rp ${THR.toLocaleString()}</p>
+        <p>PPH: Rp ${PPH.toLocaleString()}</p>
+        <p>Total Pembayaran: Rp ${totalPembayaran.toLocaleString()}</p>
+      `;
+
+      // Menyembunyikan overlay loading setelah selesai perhitungan
+      loadingOverlay.style.display = "none";
+    }, 1500); // Delay 1.5 detik untuk simulasi perhitungan
+  }
+</script>
+
+</body>
+</html>
